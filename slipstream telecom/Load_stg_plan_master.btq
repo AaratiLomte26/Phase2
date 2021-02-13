@@ -1,0 +1,20 @@
+.LOGON 192.168.77.128/Sysdba,learning;
+insert into stg_slipstream_telecom.stg_plan_master
+SELECT  Plan_type, 
+	Plan_Des,
+	CAST(Data_rate_per_kb AS DECIMAL(4,2)),
+	CAST(free_voice_min AS NUMBER(10)),
+	CAST(free_sms AS INT),
+	CAST(rate_per_min AS DECIMAL(4,2)),
+	CAST(sms_rate AS DECIMAL(4,2)),
+	CAST(monthly_charge AS INT)
+FROM lnd_slipstream_telecom.lnd_plan_master;
+
+.LOGOFF
+3:00 PM 1/25/2021
+
+12:18 PM 1/26/2021
+
+21:37 26-01-2021
+
+10:40 27-01-2021

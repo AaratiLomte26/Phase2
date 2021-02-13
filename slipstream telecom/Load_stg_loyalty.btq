@@ -1,0 +1,30 @@
+.LOGON 192.168.77.128/Sysdba,learning;
+
+insert into stg_slipstream_telecom.stg_loyalty
+select subscriber_id(NUMBER(10)), 
+	user_id(VARCHAR(30)),
+	 CASE
+	   WHEN loyalty_badge='SLVR' THEN 'Silver'
+	   WHEN loyalty_badge='BRNZ' THEN 'Bronze'
+	   WHEN loyalty_badge='GOLD' THEN 'Gold'
+	   WHEN loyalty_badge='PLAT' THEN 'Platinum'
+	 END,
+	 CAST(loyalty_spent AS INT),
+	 CAST(loyalty_accrue AS INT),
+	 CAST(Reg_date_time AS DATE FORMAT 'DD/MM/YYYY'),
+         'N'
+FROM lnd_slipstream_telecom.lnd_loyalty;
+
+
+UPDATE stg_slipstream_telecom.stg_loyalty SET Error_records = 'Y' 
+WHERE stg_loyalty.subscriber_id 
+NOT IN (SELECT subscriber_id FROM stg_slipstream_telecom.stg_cust_profile);
+
+
+
+.LOGOFF
+3:00 PM 1/25/2021
+
+12:17 PM 1/26/2021
+
+21:36 26-01-2021

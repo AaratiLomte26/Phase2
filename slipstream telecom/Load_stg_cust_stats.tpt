@@ -1,0 +1,42 @@
+DEFINE JOB Load_stg_cust_stats
+DESCRIPTION 'landing to staging movement'
+(
+	DEFINE SCHEMA lnd_cust_stats_schema
+	FROM TABLE 'lnd_slipstream_telecom.lnd_cust_stats';
+
+	DEFINE SCHEMA stg_cust_stats_schema
+	FROM TABLE 'stg_slipstream_telecom.stg_cust_stats';
+
+DEFINE OPERATOR exp_lnd_cust_stats
+TYPE EXPORT
+SCHEMA lnd_cust_stats_schema
+ATTRIBUTES
+(
+VARCHAR UserName = 'sysdba',
+VARCHAR UserPassword = 'learning',
+VARCHAR Tdpid = '192.168.77.128',
+INTEGER MaxSessions = 4,
+INTEGER TenacitySleep = 1,
+VARCHAR SelectStmt ='SELECT CAST(subscriber_id AS NUMBER(10)),CAST (paid_date AS DATE FORMAT 'DD-MM-YY') FROM lnd_slipstream_telecom.lnd_cust_stats;'
+);
+
+DEFINE OPERATOR Load_stg_cust_stats
+TYPE LOAD
+SCHEMA stg_cust_stats_schema
+ATTRIBUTES
+(
+VARCHAR UserName = 'sysdba',
+VARCHAR UserPassword = 'learning',
+VARCHAR Tdpid = '192.168.77.128',
+VARCHAR LogTable = 'stg_cust_stats_RL',
+VARCHAR TargetTable = 'lnd_slipstream_telecom.lnd_cust_profile',
+INTEGER MaxSessions = 8,
+INTEGER TenacitySleep = 1,
+VARCHAR WildCardInsert = 'Y' /*Not default*/
+);
+
+APPLY ('INSERT INTO stg_slipstream_telecom.stg_cust_stats ;')
+TO OPERATOR (Load_stg_cust_stats[1])
+SELECT * FROM OPERATOR (exp_lnd_cust_stats[1]);
+);
+
